@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "source": "Paysim.csv",
+  "canonical_columns": [
+    "event_time",
+    "transaction_type",
+    "amount",
+    "origin_account",
+    "origin_balance_before",
+    "origin_balance_after",
+    "destination_account",
+    "destination_balance_before",
+    "destination_balance_after",
+    "is_fraud"
+  ],
+  "splits": {
+    "train": {
+      "start_step": 1,
+      "end_step": 520,
+      "row_count": 6082007,
+      "fraud_count": 5781,
+      "fraud_rate": 0.0009505086067806235
+    },
+    "validation": {
+      "start_step": 521,
+      "end_step": 631,
+      "row_count": 191147,
+      "fraud_count": 1180,
+      "fraud_rate": 0.006173259323975788
+    },
+    "test": {
+      "start_step": 632,
+      "end_step": 743,
+      "row_count": 89466,
+      "fraud_count": 1252,
+      "fraud_rate": 0.01399414302640109
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "seed": 20260823,
+  "purpose": "offline-only evaluation fixtures for defensive spike detection",
+  "scenarios": [
+    {
+      "scenario_id": "validation_velocity_01",
+      "split": "validation",
+      "family": "velocity_burst",
+      "start_step": 545,
+      "end_step": 546,
+      "injected_event_count": 120
+    },
+    {
+      "scenario_id": "validation_amount_01",
+      "split": "validation",
+      "family": "amount_repetition",
+      "start_step": 590,
+      "end_step": 591,
+      "injected_event_count": 100
+    },
+    {
+      "scenario_id": "test_velocity_01",
+      "split": "test",
+      "family": "velocity_burst",
+      "start_step": 655,
+      "end_step": 656,
+      "injected_event_count": 120
+    },
+    {
+      "scenario_id": "test_amount_01",
+      "split": "test",
+      "family": "amount_repetition",
+      "start_step": 685,
+      "end_step": 686,
+      "injected_event_count": 100
+    },
+    {
+      "scenario_id": "test_destination_01",
+      "split": "test",
+      "family": "destination_concentration",
+      "start_step": 715,
+      "end_step": 716,
+      "injected_event_count": 100
+    }
+  ]
+}

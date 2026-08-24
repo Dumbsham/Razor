@@ -1,0 +1,40 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+
+.venv/
+venv/
+env/
+ENV/
+
+
+.env
+.env.local
+*.secrets
+
+
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+
+
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+.hypothesis/
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# PyCharm / IntelliJ
+.idea/
+Paysim.csv
