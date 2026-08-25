@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "lookback_steps": 6,
+  "stride_steps": 1,
+  "cutoff_rule": "features use only event_time < window_start",
+  "columns": [
+    "window_start",
+    "window_end",
+    "feature_cutoff",
+    "lookback_start",
+    "event_count",
+    "velocity_per_step",
+    "amount_mean",
+    "amount_std",
+    "amount_deviation",
+    "mean_interarrival_steps",
+    "unique_origins",
+    "unique_destinations",
+    "destination_entropy",
+    "amount_entropy",
+    "repetition_ratio",
+    "is_synthetic_spike",
+    "scenario_ids"
+  ],
+  "row_count": 514
+}

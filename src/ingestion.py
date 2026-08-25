@@ -9,6 +9,7 @@ from typing import Final
 
 import pandas as pd
 
+# iss project ke kaam karne ke liye inn columns ka hona zaruri hai
 REQUIRED_SOURCE_COLUMNS: Final[set[str]] = {
     "step",
     "type",
@@ -36,6 +37,7 @@ CANONICAL_COLUMNS: Final[list[str]] = [
     "is_fraud",
 ]
 
+#renaming columns -> i.e. canonical schema
 RENAME_MAP: Final[dict[str, str]] = {
     "step": "event_time",
     "type": "transaction_type",
@@ -48,6 +50,7 @@ RENAME_MAP: Final[dict[str, str]] = {
     "isFraud": "is_fraud",
 }
 
+#datatype of each column
 READ_DTYPES: Final[dict[str, str]] = {
     "step": "int16",
     "type": "string",

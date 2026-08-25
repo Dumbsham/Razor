@@ -1,0 +1,23 @@
+{
+  "feature_columns": [
+    "event_count",
+    "velocity_per_step",
+    "amount_mean",
+    "unique_destinations",
+    "repetition_ratio"
+  ],
+  "means": {
+    "event_count": 70884.34630350195,
+    "velocity_per_step": 11814.057717250324,
+    "amount_mean": 327069.4852191059,
+    "unique_destinations": 59503.184824902724,
+    "repetition_ratio": 0.0022482924658663093
+  },
+  "stds": {
+    "event_count": 79242.56477324017,
+    "velocity_per_step": 13207.094128873361,
+    "amount_mean": 412072.73050329403,
+    "unique_destinations": 64377.461994935926,
+    "repetition_ratio": 0.004991802215807952
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "baseline_zscore": {
+    "threshold": 3.0,
+    "metrics": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tn": 88,
+      "fp": 3,
+      "fn": 14,
+      "tp": 0,
+      "pr_auc": 0.1117283474677073,
+      "roc_auc": 0.4065934065934066
+    },
+    "latency": {
+      "validation_velocity_01": null,
+      "validation_amount_01": null
+    }
+  },
+  "isolation_forest": {
+    "optimal_threshold": 0.41177492798313753,
+    "metrics": {
+      "precision": 0.1346153846153846,
+      "recall": 1.0,
+      "f1": 0.23728813559322035,
+      "tn": 1,
+      "fp": 90,
+      "fn": 0,
+      "tp": 14,
+      "pr_auc": 0.0957137408322562,
+      "roc_auc": 0.2880690737833595
+    },
+    "latency": {
+      "validation_velocity_01": 0,
+      "validation_amount_01": 0
+    }
+  }
+}

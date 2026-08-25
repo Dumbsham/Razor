@@ -70,11 +70,11 @@ Before presentation day, all items below must be true.
 
 **Outcome:** a versioned window-feature table fit for both models.
 
-- [ ] **0:00–1:00:** Choose one window size and one stride that give a smooth demo while retaining enough observations; document the choice.
-- [ ] **1:00–3:30:** Implement backward-looking-only features: velocity/count, amount mean/std/deviation, inter-arrival time, unique destinations, and entropy/repetition signals where fields allow.
-- [ ] **3:30–4:30:** Ensure feature state uses only events before each scoring window; add an assertion/test guarding against future timestamps.
-- [ ] **4:30–5:15:** Persist a processed feature dataset with schema/version metadata.
-- [ ] **5:15–6:00:** Plot feature distributions for normal and labeled-spike windows as a sanity check.
+- [x] **0:00–1:00:** Choose one window size and one stride that give a smooth demo while retaining enough observations; document the choice.
+- [x] **1:00–3:30:** Implement backward-looking-only features: velocity/count, amount mean/std/deviation, inter-arrival time, unique destinations, and entropy/repetition signals where fields allow.
+- [x] **3:30–4:30:** Ensure feature state uses only events before each scoring window; add an assertion/test guarding against future timestamps.
+- [x] **4:30–5:15:** Persist a processed feature dataset with schema/version metadata.
+- [x] **5:15–6:00:** Plot feature distributions for normal and labeled-spike windows as a sanity check.
 
 **Acceptance check:** processed data is reproducible from raw data and a reviewer can verify no future events contribute to a row.
 
@@ -82,11 +82,11 @@ Before presentation day, all items below must be true.
 
 **Outcome:** an end-to-end baseline that detects some spikes and establishes a comparison point.
 
-- [ ] **0:00–2:00:** Implement rolling EWMA/z-score scoring in `src/models/baseline_zscore.py` using training-derived normalization.
-- [ ] **2:00–3:00:** Tune only on validation data, using a small documented search grid.
-- [ ] **3:00–4:30:** Implement window-to-spike alert grouping and detection-latency calculation.
-- [ ] **4:30–5:15:** Calculate validation precision, recall, F1, PR-AUC where applicable, confusion matrix, and latency.
-- [ ] **5:15–6:00:** Save a baseline report and identify the two strongest, safely phrased alert reasons.
+- [x] **0:00–2:00:** Implement rolling EWMA/z-score scoring in `src/models/baseline_zscore.py` using training-derived normalization.
+- [x] **2:00–3:00:** Tune only on validation data, using a small documented search grid.
+- [x] **3:00–4:30:** Implement window-to-spike alert grouping and detection-latency calculation.
+- [x] **4:30–5:15:** Calculate validation precision, recall, F1, PR-AUC where applicable, confusion matrix, and latency.
+- [x] **5:15–6:00:** Save a baseline report and identify the two strongest, safely phrased alert reasons.
 
 **Acceptance check:** one command produces baseline metrics, an alert timeline, and a latency result for every labeled test scenario (even if missed).
 
@@ -94,11 +94,11 @@ Before presentation day, all items below must be true.
 
 **Outcome:** a robust primary detector and a fair comparison to baseline.
 
-- [ ] **0:00–1:00:** Finalize feature set and preprocessing pipeline; fit scalers only on training windows.
-- [ ] **1:00–2:30:** Train Isolation Forest on normal/training windows and persist model plus feature schema.
-- [ ] **2:30–4:00:** Evaluate score behavior on validation windows; inspect false positives rather than tuning blindly.
-- [ ] **4:00–5:00:** Choose a validation threshold candidate using the business-cost objective.
-- [ ] **5:00–6:00:** Produce a baseline-vs-Isolation-Forest comparison table with consistent splits and definitions.
+- [x] **0:00–1:00:** Finalize feature set and preprocessing pipeline; fit scalers only on training windows.
+- [x] **1:00–2:30:** Train Isolation Forest on normal/training windows and persist model plus feature schema.
+- [x] **2:30–4:00:** Evaluate score behavior on validation windows; inspect false positives rather than tuning blindly.
+- [x] **4:00–5:00:** Choose a validation threshold candidate using the business-cost objective.
+- [x] **5:00–6:00:** Produce a baseline-vs-Isolation-Forest comparison table with consistent splits and definitions.
 
 **Acceptance check:** the primary model improves at least one meaningful objective over baseline, or the baseline remains the documented production choice. Never hide an unfavorable comparison.
 
@@ -106,12 +106,12 @@ Before presentation day, all items below must be true.
 
 **Outcome:** credible operating-point selection and a test plan that cannot drift.
 
-- [ ] **0:00–1:30:** Define transparent illustrative cost assumptions: review/customer-friction cost for a false positive; expected loss for a missed spike; review cost for a true positive.
-- [ ] **1:30–3:00:** Implement `src/evaluate.py` to calculate expected cost across validation thresholds.
-- [ ] **3:00–4:00:** Produce cost-vs-threshold, precision-recall, and confusion-matrix artifacts.
-- [ ] **4:00–4:45:** Select and freeze the operating point from validation minimum expected cost.
-- [ ] **4:45–5:30:** Write a short methodology note explaining time splits, synthetic labels, assumptions, and limitations.
-- [ ] **5:30–6:00:** Add a single `make`/`uv run` command or script that reproduces all offline artifacts.
+- [x] **0:00–1:30:** Define transparent illustrative cost assumptions: review/customer-friction cost for a false positive; expected loss for a missed spike; review cost for a true positive.
+- [x] **1:30–3:00:** Implement `src/evaluate.py` to calculate expected cost across validation thresholds.
+- [x] **3:00–4:00:** Produce cost-vs-threshold, precision-recall, and confusion-matrix artifacts.
+- [x] **4:00–4:45:** Select and freeze the operating point from validation minimum expected cost.
+- [x] **4:45–5:30:** Write a short methodology note explaining time splits, synthetic labels, assumptions, and limitations.
+- [x] **5:30–6:00:** Add a single `make`/`uv run` command or script that reproduces all offline artifacts.
 
 **Acceptance check:** model, features, threshold, and cost assumptions are frozen before test evaluation; the methodology explains why cost optimization may choose a different threshold from max-F1.
 
@@ -119,12 +119,12 @@ Before presentation day, all items below must be true.
 
 **Outcome:** final evidence for the demo.
 
-- [ ] **0:00–1:00:** Verify that test data has never been used for fitting, scaling, parameter selection, or threshold choice.
-- [ ] **1:00–2:30:** Run the frozen pipeline once on held-out test data and save immutable metric outputs.
-- [ ] **2:30–3:30:** Generate final PR-AUC, ROC-AUC if meaningful, precision, recall, F1, confusion matrix, detection latency, and cost curve.
-- [ ] **3:30–4:30:** Review false positives and false negatives; select one honest example of each for notes, not necessarily the live demo.
-- [ ] **4:30–5:15:** Create `reports/metrics_report.md` with assumptions, results, comparison table, and limitations.
-- [ ] **5:15–6:00:** Freeze one compelling seeded replay scenario for the demo; separate it from the final evaluation artifact if needed.
+- [x] **0:00–1:00:** Verify that test data has never been used for fitting, scaling, parameter selection, or threshold choice.
+- [x] **1:00–2:30:** Run the frozen pipeline once on held-out test data and save immutable metric outputs.
+- [x] **2:30–3:30:** Generate final PR-AUC, ROC-AUC if meaningful, precision, recall, F1, confusion matrix, detection latency, and cost curve.
+- [x] **3:30–4:30:** Review false positives and false negatives; select one honest example of each for notes, not necessarily the live demo.
+- [x] **4:30–5:15:** Create `reports/metrics_report.md` with assumptions, results, comparison table, and limitations.
+- [x] **5:15–6:00:** Freeze one compelling seeded replay scenario for the demo; separate it from the final evaluation artifact if needed.
 
 **Acceptance check:** every number shown to judges is traceable to a saved held-out report, and any synthetic-label limitation is clearly disclosed.
 

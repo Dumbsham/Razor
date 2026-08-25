@@ -1,0 +1,9 @@
+{
+  "scenario_id": "test_velocity_01",
+  "split": "test",
+  "family": "velocity_burst",
+  "start_step": 655,
+  "end_step": 656,
+  "injected_event_count": 120,
+  "description": "A rapid burst of transactions indicating a velocity attack."
+}
