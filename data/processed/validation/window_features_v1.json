@@ -19,6 +19,12 @@
     "destination_entropy",
     "amount_entropy",
     "repetition_ratio",
+    "max_entity_relative_velocity",
+    "max_entity_relative_amount",
+    "max_entity_relative_velocity_lag1",
+    "max_entity_relative_amount_lag1",
+    "velocity_delta",
+    "amount_delta",
     "is_synthetic_spike",
     "scenario_ids"
   ],

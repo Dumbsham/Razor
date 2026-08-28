@@ -1,4 +1,12 @@
 scenario_id,split,family,event_time,is_synthetic_spike
+train_velocity_01,train,velocity_burst,150,True
+train_velocity_01,train,velocity_burst,151,True
+train_amount_01,train,amount_repetition,250,True
+train_amount_01,train,amount_repetition,251,True
+train_velocity_02,train,velocity_burst,350,True
+train_velocity_02,train,velocity_burst,351,True
+train_destination_01,train,destination_concentration,450,True
+train_destination_01,train,destination_concentration,451,True
 validation_velocity_01,validation,velocity_burst,545,True
 validation_velocity_01,validation,velocity_burst,546,True
 validation_amount_01,validation,amount_repetition,590,True

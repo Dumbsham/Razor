@@ -52,27 +52,29 @@ def main():
     print(json.dumps(base_metrics, indent=2))
     print(f"Baseline Latency: {base_latency}")
     
-    print("\n--- Day 5: Isolation Forest Model ---")
-    iso_forest = IsolationForestModel(contamination=0.01, random_state=42)
-    iso_forest.fit(train)
-    iso_forest.save(args.models_dir)
+    print("\n--- Phase 3: LightGBM Detector ---")
+    from src.models.lightgbm_detector import LightGBMDetector
+    detector = LightGBMDetector()
+    y_train = train["is_synthetic_spike"]
+    detector.fit(train, y_train, val, y_val)
+    detector.save(args.models_dir)
     
-    iso_scores = iso_forest.predict_scores(val)
+    lgb_scores = detector.predict_scores(val)
     
     # Calculate costs over range of thresholds
-    thresholds = np.linspace(iso_scores.min(), iso_scores.max(), 50)
-    cost_df = calculate_expected_costs(y_val, iso_scores, thresholds, cost_fp=500.0, cost_fn=10000.0, cost_tp=100.0)
+    thresholds = np.linspace(lgb_scores.min(), lgb_scores.max(), 50)
+    cost_df = calculate_expected_costs(y_val, lgb_scores, thresholds, cost_fp=500.0, cost_fn=10000.0, cost_tp=100.0)
     
     optimal_thresh = get_optimal_threshold(cost_df)
     print(f"Optimal Threshold (Expected Cost): {optimal_thresh:.4f}")
     
-    iso_preds = iso_scores > optimal_thresh
-    iso_metrics = evaluate_predictions(y_val, iso_preds, iso_scores)
-    iso_latency = calculate_latency(val, iso_preds)
+    lgb_preds = lgb_scores > optimal_thresh
+    lgb_metrics = evaluate_predictions(y_val, lgb_preds, lgb_scores)
+    lgb_latency = calculate_latency(val, lgb_preds)
     
-    print(f"Isolation Forest Metrics (Threshold={optimal_thresh:.4f}):")
-    print(json.dumps(iso_metrics, indent=2))
-    print(f"Isolation Forest Latency: {iso_latency}")
+    print(f"LightGBM Metrics (Threshold={optimal_thresh:.4f}):")
+    print(json.dumps(lgb_metrics, indent=2))
+    print(f"LightGBM Latency: {lgb_latency}")
     
     # Save comparison report
     report = {
@@ -81,10 +83,10 @@ def main():
             "metrics": base_metrics,
             "latency": base_latency
         },
-        "isolation_forest": {
+        "lightgbm": {
             "optimal_threshold": optimal_thresh,
-            "metrics": iso_metrics,
-            "latency": iso_latency
+            "metrics": lgb_metrics,
+            "latency": lgb_latency
         }
     }
     

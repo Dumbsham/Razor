@@ -1,20 +1,20 @@
 {
-  "threshold": 0.41177492798313753,
+  "threshold": 0.08434892064693292,
   "metrics": {
-    "precision": 0.19811320754716982,
+    "precision": 1.0,
     "recall": 1.0,
-    "f1": 0.33070866141732286,
-    "tn": 0,
-    "fp": 85,
+    "f1": 1.0,
+    "tn": 85,
+    "fp": 0,
     "fn": 0,
     "tp": 21,
-    "pr_auc": 0.25114362355146014,
-    "roc_auc": 0.5383753501400561,
-    "total_cost": 44600.0
+    "pr_auc": 1.0,
+    "roc_auc": 1.0,
+    "total_cost": 2100.0
   },
   "latency": {
-    "test_velocity_01": 0,
+    "test_destination_01": 0,
     "test_amount_01": 0,
-    "test_destination_01": 0
+    "test_velocity_01": 0
   }
 }

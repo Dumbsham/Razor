@@ -19,7 +19,11 @@ def main():
     
     print("Loading transactions...")
     transactions = load_transactions(args.input)
-    splits = split_transactions(transactions)
+    
+    # Critical fix: actually inject the synthetic spikes into the stream before building features!
+    from src.spike_injection import inject_scenarios, DEFAULT_SCENARIOS
+    augmented_transactions, _ = inject_scenarios(transactions, DEFAULT_SCENARIOS)
+    splits = split_transactions(augmented_transactions)
     
     labels_path = Path(args.labels)
     if labels_path.exists():

@@ -27,13 +27,59 @@ class SpikeScenario:
     injected_event_count: int
 
 
-DEFAULT_SCENARIOS: Final[tuple[SpikeScenario, ...]] = (
-    SpikeScenario("validation_velocity_01", "validation", "velocity_burst", 545, 546, 120),
-    SpikeScenario("validation_amount_01", "validation", "amount_repetition", 590, 591, 100),
-    SpikeScenario("test_velocity_01", "test", "velocity_burst", 655, 656, 120),
-    SpikeScenario("test_amount_01", "test", "amount_repetition", 685, 686, 100),
-    SpikeScenario("test_destination_01", "test", "destination_concentration", 715, 716, 100),
-)
+
+def get_scenarios(difficulty: Literal["easy", "medium", "hard", "extreme"] = "easy") -> tuple[SpikeScenario, ...]:
+    if difficulty == "easy":
+        return (
+            SpikeScenario("train_velocity_01", "train", "velocity_burst", 150, 151, 120),
+            SpikeScenario("train_amount_01", "train", "amount_repetition", 250, 251, 100),
+            SpikeScenario("train_velocity_02", "train", "velocity_burst", 350, 351, 120),
+            SpikeScenario("train_destination_01", "train", "destination_concentration", 450, 451, 100),
+            SpikeScenario("validation_velocity_01", "validation", "velocity_burst", 545, 546, 120),
+            SpikeScenario("validation_amount_01", "validation", "amount_repetition", 590, 591, 100),
+            SpikeScenario("test_velocity_01", "test", "velocity_burst", 655, 656, 120),
+            SpikeScenario("test_amount_01", "test", "amount_repetition", 685, 686, 100),
+            SpikeScenario("test_destination_01", "test", "destination_concentration", 715, 716, 100),
+        )
+    elif difficulty == "medium":
+        return (
+            SpikeScenario("train_velocity_01", "train", "velocity_burst", 150, 151, 75),
+            SpikeScenario("train_amount_01", "train", "amount_repetition", 250, 251, 50),
+            SpikeScenario("train_velocity_02", "train", "velocity_burst", 350, 351, 75),
+            SpikeScenario("train_destination_01", "train", "destination_concentration", 450, 451, 50),
+            SpikeScenario("validation_velocity_01", "validation", "velocity_burst", 545, 546, 75),
+            SpikeScenario("validation_amount_01", "validation", "amount_repetition", 590, 591, 50),
+            SpikeScenario("test_velocity_01", "test", "velocity_burst", 655, 656, 75),
+            SpikeScenario("test_amount_01", "test", "amount_repetition", 685, 686, 50),
+            SpikeScenario("test_destination_01", "test", "destination_concentration", 715, 716, 50),
+        )
+    elif difficulty == "hard":
+        return (
+            SpikeScenario("train_velocity_01", "train", "velocity_burst", 150, 151, 25),
+            SpikeScenario("train_amount_01", "train", "amount_repetition", 250, 251, 20),
+            SpikeScenario("train_velocity_02", "train", "velocity_burst", 350, 351, 25),
+            SpikeScenario("train_destination_01", "train", "destination_concentration", 450, 451, 20),
+            SpikeScenario("validation_velocity_01", "validation", "velocity_burst", 545, 546, 25),
+            SpikeScenario("validation_amount_01", "validation", "amount_repetition", 590, 591, 20),
+            SpikeScenario("test_velocity_01", "test", "velocity_burst", 655, 656, 25),
+            SpikeScenario("test_amount_01", "test", "amount_repetition", 685, 686, 20),
+            SpikeScenario("test_destination_01", "test", "destination_concentration", 715, 716, 20),
+        )
+    else:  # extreme
+        return (
+            SpikeScenario("train_velocity_01", "train", "velocity_burst", 150, 151, 8),
+            SpikeScenario("train_amount_01", "train", "amount_repetition", 250, 251, 8),
+            SpikeScenario("train_velocity_02", "train", "velocity_burst", 350, 351, 8),
+            SpikeScenario("train_destination_01", "train", "destination_concentration", 450, 451, 8),
+            SpikeScenario("validation_velocity_01", "validation", "velocity_burst", 545, 546, 8),
+            SpikeScenario("validation_amount_01", "validation", "amount_repetition", 590, 591, 8),
+            SpikeScenario("test_velocity_01", "test", "velocity_burst", 655, 656, 8),
+            SpikeScenario("test_amount_01", "test", "amount_repetition", 685, 686, 8),
+            SpikeScenario("test_destination_01", "test", "destination_concentration", 715, 716, 8),
+        )
+
+DEFAULT_SCENARIOS = get_scenarios("easy")
+
 
 _REQUIRED_COLUMNS: Final[set[str]] = {
     "event_time",
@@ -66,21 +112,37 @@ def _validate_input(transactions: pd.DataFrame, scenarios: tuple[SpikeScenario, 
 
 
 def _synthetic_rows(
-    transactions: pd.DataFrame, scenario: SpikeScenario, rng: np.random.Generator
+    transactions: pd.DataFrame, scenario: SpikeScenario, rng: np.random.Generator,
+    strict_isolation: bool = False, train_accounts: set = None
 ) -> pd.DataFrame:
-    """Create clearly tagged synthetic rows without copying real account identifiers."""
-    templates = transactions.sample(n=scenario.injected_event_count, replace=True, random_state=rng)
+    counts = transactions["origin_account"].value_counts()
+    eligible = counts[counts >= 1].index
+    
+    if strict_isolation and scenario.split in ("validation", "test"):
+        if train_accounts is None:
+            train_accounts = set(transactions[transactions["event_time"] < 500]["origin_account"])
+        eligible = [acc for acc in eligible if acc not in train_accounts]
+        if not eligible:
+            raise ValueError(f"No eligible accounts for strict isolation in {scenario.split}")
+            
+    victim_account = rng.choice(eligible)
+    
     events = pd.DataFrame(index=range(scenario.injected_event_count))
     events["event_time"] = rng.integers(scenario.start_step, scenario.end_step + 1, len(events))
-    events["transaction_type"] = templates["transaction_type"].to_numpy()
-
-    sampled_amounts = templates["amount"].to_numpy(dtype=float)
+    events["transaction_type"] = "TRANSFER"
+    
+    victim_history = transactions[transactions["origin_account"] == victim_account]
+    median_amount = float(victim_history["amount"].median()) if not victim_history.empty else 1000.0
+    
     if scenario.family == "amount_repetition":
-        sampled_amounts = np.full(len(events), float(np.median(sampled_amounts)))
+        sampled_amounts = np.full(len(events), median_amount * 5.0)
+    else:
+        sampled_amounts = np.full(len(events), median_amount)
+        
     events["amount"] = sampled_amounts
-
+    events["origin_account"] = victim_account
+    
     event_number = np.arange(len(events))
-    events["origin_account"] = [f"SYNTH_ORIGIN_{scenario.scenario_id}_{n}" for n in event_number]
     if scenario.family == "destination_concentration":
         events["destination_account"] = f"SYNTH_DEST_{scenario.scenario_id}"
     else:
@@ -121,6 +183,7 @@ def inject_scenarios(
     transactions: pd.DataFrame,
     scenarios: tuple[SpikeScenario, ...] = DEFAULT_SCENARIOS,
     seed: int = SCENARIO_SEED,
+    strict_isolation: bool = False
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Append deterministic, labeled fixtures and return the augmented stream plus step labels."""
     _validate_input(transactions, scenarios)
@@ -129,7 +192,10 @@ def inject_scenarios(
     base["is_synthetic_spike_event"] = False
     base["synthetic_scenario_id"] = pd.NA
 
-    synthetic_events = [_synthetic_rows(base, scenario, rng) for scenario in scenarios]
+    train_accounts = set()
+    if strict_isolation:
+        train_accounts = set(base[base["event_time"] < 500]["origin_account"])
+    synthetic_events = [_synthetic_rows(base, scenario, rng, strict_isolation, train_accounts) for scenario in scenarios]
     augmented = pd.concat([base, *synthetic_events], ignore_index=True)
     augmented.sort_values("event_time", kind="stable", inplace=True, ignore_index=True)
     return augmented, build_step_labels(scenarios)

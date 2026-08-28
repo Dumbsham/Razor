@@ -31,7 +31,9 @@ def explain_alert(window_features: pd.Series, train_means: dict, train_stds: dic
         "destination_entropy": "Unusual destination distribution",
         "amount_entropy": "Unusual amount distribution",
         "repetition_ratio": "Highly repetitive behavior",
-        "mean_interarrival_steps": "Long gaps between transactions"
+        "mean_interarrival_steps": "Long gaps between transactions",
+        "max_entity_relative_velocity": "Entity transaction velocity spike",
+        "max_entity_relative_amount": "Entity transaction amount spike"
     }
     
     return [

@@ -28,13 +28,14 @@ def main():
     y_test = test["is_synthetic_spike"]
     
     print("Loading frozen model and threshold...")
-    iso_forest = IsolationForestModel.load(Path(args.models_dir) / "isolation_forest.pkl")
+    from src.models.lightgbm_detector import LightGBMDetector
+    detector = LightGBMDetector.load(Path(args.models_dir) / "lightgbm.pkl")
     with open(Path(args.models_dir) / "optimal_threshold.json") as f:
         opt_thresh = json.load(f)["isolation_forest_threshold"]
         
     print(f"Optimal threshold loaded: {opt_thresh:.4f}")
     
-    iso_scores = iso_forest.predict_scores(test)
+    iso_scores = detector.predict_scores(test)
     iso_preds = iso_scores > opt_thresh
     
     metrics = evaluate_predictions(y_test, iso_preds, iso_scores)
@@ -102,7 +103,10 @@ _Populate after the frozen pipeline is evaluated on the held-out test set._
 - The model uses static historical features which might drift over time in a live environment.
 - The false positive examples might include actual uncaught anomalous behavior from the underlying dataset.
 """
-    md_path = Path(args.output_dir) / "metrics_report.md"
+
+    md_path = Path("document") / "metrics_report.md"
+
+    md_path.parent.mkdir(parents=True, exist_ok=True)
     md_path.write_text(md_report)
     print(f"Saved markdown report to {md_path}")
 

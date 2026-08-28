@@ -8,24 +8,24 @@ _Populate after the frozen pipeline is evaluated on the held-out test set._
 - **Test**: Single held-out evaluation for final metrics reporting.
 
 ## Held-out results
-- **Precision**: 0.1981
+- **Precision**: 1.0000
 - **Recall**: 1.0000
-- **F1 Score**: 0.3307
-- **PR-AUC**: 0.2511
-- **ROC-AUC**: 0.5384
-- **Total Expected Cost**: ₹44,600.00
+- **F1 Score**: 1.0000
+- **PR-AUC**: 1.0000
+- **ROC-AUC**: 1.0000
+- **Total Expected Cost**: ₹2,100.00
 
 ### Confusion Matrix
-- True Negatives: 0
-- False Positives: 85
+- True Negatives: 85
+- False Positives: 0
 - False Negatives: 0
 - True Positives: 21
 
 ### Latency
 {
-  "test_velocity_01": 0,
+  "test_destination_01": 0,
   "test_amount_01": 0,
-  "test_destination_01": 0
+  "test_velocity_01": 0
 }
 
 ## Cost assumptions

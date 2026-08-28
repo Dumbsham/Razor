@@ -10,9 +10,7 @@ from src.spike_injection import DEFAULT_SCENARIOS, inject_scenarios, write_scena
 
 def main() -> None:
     transactions = load_transactions("Paysim.csv")
-    splits = split_transactions(transactions)
-    evaluation_stream = pd.concat([splits["validation"], splits["test"]], ignore_index=True)
-    augmented, labels = inject_scenarios(evaluation_stream)
+    augmented, labels = inject_scenarios(transactions)
     write_scenario_artifacts(
         augmented,
         DEFAULT_SCENARIOS,
