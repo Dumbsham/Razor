@@ -33,6 +33,27 @@ python scripts/run_all_evaluations.py
 
 The core of our pipeline is designed to eliminate **data leakage**. Predictions strictly look at historical rolling windows relative to the timestamp of the transaction being evaluated.
 
+```mermaid
+graph TD
+    A[(Raw PaySim Data)] --> B[Spike Injection Module]
+    B -->|Synthetic Fraud Inserted| C[Feature Engineering]
+    C -->|Rolling Windows| D[Data Splitting]
+    
+    D -->|Chronological Split| E[Model Training]
+    
+    E --> F{Modeling Engine}
+    F --> G[Z-Score]
+    F --> H[Isolation Forest]
+    F --> I[LightGBM]
+    
+    G --> J[Evaluation & Cost Engine]
+    H --> J
+    I --> J
+    
+    J -->|FP = ₹500, FN = ₹10,000| K[Threshold Tuning]
+    K --> L((Final Selected Model: LightGBM))
+```
+
 *   **Ingestion & Feature Engineering (`src/features.py`)**: Computes streaming metrics (velocity, volume sum, destination entropy, moving averages) right up to the exact millisecond cutoff point before scoring a transaction.
 *   **Modeling Engine (`src/models/`)**: Supports diverse strategies:
     *   *Baseline*: Statistical Z-Score
