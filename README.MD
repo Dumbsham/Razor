@@ -1,47 +1,88 @@
-# RazorPay Transaction Fraud Detection: Real-time Spike Analysis
+<div align="center">
+  <h1>💳 RazorPay Transaction Fraud Detection</h1>
+  <h3>Real-time Spike & Burst Analysis Engine</h3>
+  
+  <p>
+    A robust machine learning pipeline designed to detect sudden bursts of high velocity/volume fraudulent transactions (spikes) in financial transaction streams.
+  </p>
+</div>
 
-This project develops a robust anomaly detection pipeline to identify fraudulent transaction "spikes" (sudden bursts of high velocity/volume) in financial transaction streams. It evaluates unsupervised, semi-supervised, and supervised machine learning approaches.
+---
 
-## Architecture
-The pipeline is designed around a strictly forward-looking rolling window feature extractor, ensuring zero data leakage between time steps.
-- **Ingestion & Feature Engineering (`src/features.py`)**: Computes rolling metrics (velocity, volume, destination entropy, amount deviations) up to the exact cutoff point before a transaction is scored.
-- **Modeling (`src/models/`)**: Contains implementations for Baseline Z-Score, Isolation Forest, and LightGBM.
-- **Evaluation & Cost Engine (`src/evaluate.py`)**: Uses expected-cost minimization (asymmetrical penalties for False Negatives vs False Positives) to tune thresholds.
+## 📖 Overview
 
-## Dataset
-We utilized the publicly available **PaySim** mobile money dataset. Since standard datasets lack explicit labels for rapid automated "spike" attacks (e.g., bot-driven credential stuffing or immediate cash-outs), we engineered a deterministic **synthetic spike injection module** (`src/spike_injection.py`) that overlays controlled fraudulent bursts into the stream across different difficulty tiers (easy, medium, hard, extreme). 
+In modern financial systems like RazorPay, attackers often employ automated scripts or botnets to rapidly cash out compromised accounts, leading to a "spike" in transaction velocity. This project provides a complete pipeline to ingest transaction data, perform rolling-window feature engineering, and evaluate various anomaly detection strategies—focusing heavily on real-world **business cost optimization** over traditional classification metrics.
 
-## Methodology
-1. **Train/Validation/Test Splits**: Time-based chronological splitting (Train: steps <500, Validation: 500-600, Test: >600).
-2. **Feature Construction**: Window-based aggregation (e.g., event counts, amount std dev, unique origins/destinations). 
-3. **Threshold Tuning**: Rather than optimizing for pure F1, we tuned the classification thresholds on the validation set to minimize **Total Expected Cost**.
-4. **Degradation Testing**: We ran exhaustive tests at progressively harder tiers (lowering the severity of the spike) to find the exact breaking point of the model's multivariate decision boundary.
+## 🚀 Quick Start
 
-## Results
-A side-by-side comparison evaluated the models on the held-out test set:
+```bash
+# 1. Install dependencies (requires uv or pip)
+uv sync
+
+# 2. Build rolling window features from raw dataset
+python scripts/build_features.py
+
+# 3. Inject synthetic fraudulent bursts
+python scripts/generate_synthetic_spikes.py
+
+# 4. Train, evaluate, and tune thresholds for models
+python scripts/run_all_evaluations.py
+```
+
+## 🏗️ System Architecture
+
+The core of our pipeline is designed to eliminate **data leakage**. Predictions strictly look at historical rolling windows relative to the timestamp of the transaction being evaluated.
+
+*   **Ingestion & Feature Engineering (`src/features.py`)**: Computes streaming metrics (velocity, volume sum, destination entropy, moving averages) right up to the exact millisecond cutoff point before scoring a transaction.
+*   **Modeling Engine (`src/models/`)**: Supports diverse strategies:
+    *   *Baseline*: Statistical Z-Score
+    *   *Unsupervised*: Isolation Forest
+    *   *Supervised*: LightGBM (Gradient Boosting)
+*   **Evaluation & Cost Engine (`src/evaluate.py`)**: Models are optimized not for F1 score, but for **Total Expected Cost**. We severely penalize missed fraud (False Negatives) over false alarms (False Positives).
+
+## 📊 Dataset & Synthetic Spikes
+
+This project is built using the publicly available **PaySim** mobile money dataset. 
+
+**The Challenge:** Public datasets do not contain explicit, labeled examples of high-velocity "spike" attacks (e.g., credential stuffing or immediate massive cash-outs).
+**The Solution:** We engineered a highly deterministic **Synthetic Spike Injection Module** (`src/spike_injection.py`). This allows us to overlay controlled, rapid fraudulent bursts onto normal traffic streams across multiple difficulty tiers: *Easy, Medium, Hard, and Extreme.*
+
+## 🔬 Methodology
+
+1.  **Strict Chronological Splitting**: Train (steps <500) ➔ Validation (500-600) ➔ Test (>600). We do not shuffle time, ensuring realistic time-series evaluation.
+2.  **Rolling Aggregations**: We constructed moving-window aggregations covering metrics like transaction counts, amount standard deviation, and unique origin/destination footprints.
+3.  **Cost-Sensitive Tuning**: Standard classification thresholds (e.g., > 0.5) are inadequate for fraud. We mapped costs—e.g., False Positive = ₹500 (manual review friction) and False Negative = ₹10,000 (chargeback loss)—and tuned the threshold strictly on the validation set to find the lowest possible financial impact.
+4.  **Degradation Profiling**: We exposed our models to progressively stealthier spikes (lower volumes, fewer transactions) to determine the exact breaking point of our multivariate decision boundaries.
+
+## 📈 Results
+
+A side-by-side comparison on the held-out test set demonstrates the effectiveness of the supervised LightGBM approach when combined with our custom cost-optimization strategy.
 
 | Model | Precision | Recall | F1 Score | Expected Cost |
-|-------|-----------|--------|----------|---------------|
-| Baseline Z-Score | 19.2%     | 95.2%  | 0.32     | ₹54,000       |
-| Isolation Forest | 24.4%     | 95.2%  | 0.39     | ₹43,000       |
-| **LightGBM**     | **100.0%**| **100.0%**| **1.00** | **₹2,100**   |
+| :--- | :--- | :--- | :--- | :--- |
+| **Baseline Z-Score** | 19.2% | 95.2% | 0.32 | ₹54,000 |
+| **Isolation Forest** | 24.4% | 95.2% | 0.39 | ₹43,000 |
+| **LightGBM** | **100.0%** | **100.0%** | **1.00** | **₹2,100** |
 
-**Final Model Choice: LightGBM**. 
-It was chosen because it achieves the lowest Expected Cost. While F1 scores are high for the synthetic test set, the cost asymmetry (FN = ₹10,000 vs FP = ₹500) highlights how well LightGBM isolates genuine spikes from background noise without generating costly friction for legitimate customers.
+🏆 **Final Selection: LightGBM**
+While the synthetic 100% test F1 score is a byproduct of the "Easy" tier's deterministic nature, LightGBM dramatically isolated genuine spikes from background noise, cutting the theoretical operational loss to just ₹2,100 compared to ₹54,000 from a basic Z-Score approach.
 
-Detailed reports can be found in the `reports/` directory:
-- [Final Model Comparison](reports/final_model_comparison.md)
-- [Explainability Report](reports/explainability_report.md)
+---
 
-## Limitations & Honest Assessment
-- **Cost Assumptions**: The cost assumptions (False Positive = ₹500, False Negative = ₹10,000) are illustrative and not sourced from actual merchant or RazorPay operational data. In production, these should be mapped to the real cost of manual review (FP) and average chargeback/loss amounts (FN).
-- **Synthetic Nature of Labels**: The dataset is a synthetic spike injection overlaid on top of PaySim. It does not represent real-world fraud-spike incidents natively, meaning real-world fraudsters might exhibit patterns not captured by our injection logic.
-- **Entity-Level Isolation**: Entity-level train/test isolation was tested. The model relies heavily on historical velocity baselines, meaning cold-start accounts (those unseen in training) can experience higher false-positive rates if they suddenly transact quickly.
-- **Degradation & Breaking Point**: Degradation testing found the model's breaking point at ~1.33x baseline velocity (4 injected events). At this tier, to maintain 100% recall, the precision violently dropped to 15.4% (generating 115 false positives). At 1.0x baseline velocity (3 events), the model finally dropped in Recall to 71.4%. 
-- **Test Set Size**: The test set features represent ~137 distinct rolling windows. This small sample size affects the statistical confidence of the perfect 1.0 F1 score achieved on the "easy" tier.
+## 🛑 Limitations & Honest Assessment
 
-## Defense-Only Compliance
-This project was developed strictly for defensive monitoring and analytics. 
-- **No Evasion Testing**: No functionality in this repository generates or tests fraud evasion patterns against production systems.
-- **No Exploitable Output**: The outputs, models, and features do not expose actual production thresholds, rules, or bypass methodologies. 
-- **Monitoring Only**: The system acts strictly as an offline observational detector designed to alert on anomalous behavior, completely isolated from active transaction authorization pipelines.
+Transparency is critical in machine learning. This pipeline has the following known constraints and assumptions:
+
+*   **Cost Assumptions are Illustrative**: The asymmetric cost ratio (FP: ₹500, FN: ₹10,000) was chosen to demonstrate the architecture's capability. In production, these numbers must be sourced directly from actual merchant risk metrics, average ticket sizes, and operational review center costs.
+*   **Synthetic Target Variables**: Because the dataset relies on synthetic injection, the "fraud" patterns are highly deterministic. Real-world threat actors adapt, randomize their timing, and use highly distributed IPs/devices. The model currently learns our injection logic rather than an organic, evolving adversary.
+*   **Cold-Start Vulnerability**: The model heavily weights historical velocity baselines per entity. A legitimate, brand-new user (cold-start) conducting their first few rapid transactions runs a high risk of being falsely classified as a spike until sufficient baseline history is established.
+*   **Known Breaking Point**: Exhaustive degradation testing proved that the model breaks under "Extreme" stealth attacks. At 1.33x baseline velocity (just 4 anomalous events), maintaining perfect recall caused precision to plummet to 15.4% (generating 115 false positives). At 1.0x baseline velocity, the model failed entirely, with recall dropping to 71.4%.
+*   **Sample Size Confidence**: The test set features represent only ~137 distinct rolling windows containing spikes. This small statistical sample size means the perfect 1.0 test score lacks broad statistical confidence and would likely degrade in a massive production stream.
+
+## 🛡️ Defense-Only Compliance
+
+This repository was developed **strictly for defensive monitoring, risk analytics, and educational purposes**.
+
+*   **No Evasion Tools**: There is no code within this repository that generates, tests, or assists in creating fraud evasion patterns against active production systems.
+*   **No Exploitable Output**: The metrics, models, and features do not expose actual, proprietary production rules, bypass techniques, or proprietary authorization logic.
+*   **Read-Only Architecture**: The pipeline functions entirely as an offline observational detector, entirely disconnected from live, active transaction authorization gateways.
